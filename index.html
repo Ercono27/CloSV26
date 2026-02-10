@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloe Saint Valentin</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sacramento&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div id="rain-layer"></div>
+    <div class="container">
+        <div class="text">
+            Cloe Atrachimowicz,<br>Seriez-vous intéressée de passer la Saint-Valentin en mon agréable compagnie ?
+        </div>
+        <div class="answer">
+            <button class="yes" id="yesBtn">Oui absolument!</button>
+            <button class="no" id="noBtn">Non.</button>
+        </div>
+    </div>
+    <div id="customAlertNo">
+        <img src="/img/EMbrylex.webp" class="img1" />
+        <p>Comment ça, non ? C'était une question rhétorique.</p>
+        <button id="closeAlert">Rattrape-toi vite.</button>
+    </div>
+    <div id="customAlertYes">
+        <img src="/img/EctoLove.png">
+        <p>Excellent choix, mademoiselle! Je vous aime !❤️</p>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const noBtn = document.getElementById("noBtn");
+            const yesBtn = document.getElementById("yesBtn");
+            const rainLayer = document.getElementById("rain-layer");
+            const images = ["img/coeur.png", "img/rose.png"];
+            const alertBoxNo = document.getElementById("customAlertNo");
+            const alertBoxYes = document.getElementById("customAlertYes");
+            const closeBtn = document.getElementById("closeAlert");
+
+            noBtn.addEventListener("mouseover", () => {
+                const x = Math.random() * 300 - 150;
+                const y = Math.random() * 200 - 100;
+                noBtn.style.transform = `translate(${x}px, ${y}px)`;
+            });
+
+            let speedFactor = 1;
+            let accumulate = false;
+            let columns = [];
+
+            function createFallingImage() {
+                const img = document.createElement("img");
+                img.src = images[Math.floor(Math.random() * images.length)];
+                img.style.position = "absolute";
+                const imgWidth = 50;
+                const left = Math.random() * (window.innerWidth - imgWidth);
+                img.style.left = left + "px";
+                img.style.top = "-60px";
+                img.style.width = imgWidth + "px";
+                img.style.transform = "rotate(0deg)";
+                rainLayer.appendChild(img);
+
+                const duration = (Math.random() * 3 + 1.5) / speedFactor;
+                const screenHeight = window.innerHeight;
+                let start = null;
+
+                const columnIndex = Math.floor(left / imgWidth);
+                if (!columns[columnIndex]) columns[columnIndex] = screenHeight - 50;
+
+                function animate(timestamp) {
+                    if (!start) start = timestamp;
+                    let progress = (timestamp - start) / (duration * 1000);
+                    if (progress > 1) progress = 1;
+
+                    const targetY = accumulate ? columns[columnIndex] : screenHeight - 50;
+                    img.style.top = (-60 + progress * (targetY + 60)) + "px";
+                    img.style.transform = `rotate(${progress * 360}deg)`;
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        if (accumulate) {
+                            columns[columnIndex] -= imgWidth;
+                            img.style.top = columns[columnIndex] + "px";
+                        } else {
+                            img.remove();
+                        }
+                    }
+                }
+
+                requestAnimationFrame(animate);
+            }
+            setInterval(createFallingImage, 150);
+            yesBtn.addEventListener("click", () => {
+                speedFactor = 7;
+                accumulate = true;
+                rainLayer.style.zIndex = 15;
+                setTimeout(() => { alertBoxYes.classList.add("show") }, 3000)
+            });
+
+            noBtn.addEventListener("click", () => alertBoxNo.classList.add("show"));
+            closeBtn.addEventListener("click", () => alertBoxNo.classList.remove("show"));
+
+        });
+    </script>
+
+
+</body>
+
+</html>
